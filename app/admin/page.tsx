@@ -372,7 +372,7 @@ export default function AdminDashboard() {
                     Заявки пока отсутствуют
                   </p>
                 ) : (
-                  <table className="admin-table">
+                  <table className="admin-table bookings-table">
                     <thead>
                       <tr>
                         <th>Клиент</th>
@@ -457,7 +457,7 @@ export default function AdminDashboard() {
                     Туры пока отсутствуют. Добавьте свой первый тур!
                   </p>
                 ) : (
-                  <table className="admin-table">
+                  <table className="admin-table tours-table">
                     <thead>
                       <tr>
                         <th>Фото</th>
