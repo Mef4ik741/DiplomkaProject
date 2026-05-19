@@ -49,6 +49,37 @@ export default function AdminDashboard() {
   const [formImage, setFormImage] = useState("");
   const [formError, setFormError] = useState("");
   const [formSaving, setFormSaving] = useState(false);
+  const [uploading, setUploading] = useState(false);
+
+  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setUploading(true);
+    setFormError("");
+
+    const formData = new FormData();
+    formData.append("file", file);
+
+    try {
+      const res = await fetch("/api/admin/upload", {
+        method: "POST",
+        body: formData,
+      });
+
+      if (res.ok) {
+        const data = await res.json();
+        setFormImage(data.url);
+      } else {
+        const data = await res.json();
+        setFormError(data.error || "Не удалось загрузить изображение");
+      }
+    } catch (err) {
+      setFormError("Ошибка сети при загрузке файла");
+    } finally {
+      setUploading(false);
+    }
+  };
 
   // Authenticate and fetch initial data
   useEffect(() => {
@@ -596,16 +627,63 @@ export default function AdminDashboard() {
                     />
                   </div>
 
-                  <div className="admin-form-group">
-                    <label>Ссылка на фоновое изображение *</label>
-                    <input
-                      type="url"
-                      className="admin-form-input"
-                      value={formImage}
-                      onChange={(e) => setFormImage(e.target.value)}
-                      placeholder="Вставьте URL изображения (Unsplash и т.д.)"
-                      required
-                    />
+                  <div className="admin-form-group admin-form-span-2">
+                    <label>Изображение тура *</label>
+                    <div className="admin-image-upload-wrapper">
+                      {/* Область для загрузки файла */}
+                      <div className={`admin-upload-zone ${uploading ? "uploading" : ""}`}>
+                        <input
+                          type="file"
+                          id="tour-image-file"
+                          accept="image/*"
+                          onChange={handleFileUpload}
+                          disabled={uploading}
+                          style={{ display: "none" }}
+                        />
+                        <label htmlFor="tour-image-file" className="admin-upload-label">
+                          {uploading ? (
+                            <span className="admin-upload-spinner-wrap">
+                              <span className="admin-upload-spinner"></span>
+                              Загрузка изображения...
+                            </span>
+                          ) : (
+                            <>
+                              <svg className="admin-upload-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+                                <path strokeLinecap="round" strokeLinejoin="round" d="M12 16.5V9.75m0 0l3 3m-3-3l-3 3M6.75 19.5a4.5 4.5 0 01-1.41-8.775 5.25 5.25 0 0110.233-2.33 3 3 0 013.758 3.848A3.752 3.752 0 0118 19.5H6.75z" />
+                              </svg>
+                              <span>Выберите файл изображения (или перетащите его сюда)</span>
+                            </>
+                          )}
+                        </label>
+                      </div>
+
+                      {/* Ручной ввод URL и превью */}
+                      <div className="admin-upload-url-and-preview">
+                        <div className="admin-url-input-field">
+                          <label style={{ fontSize: "0.75rem", color: "var(--ink-light)", display: "block", marginBottom: "0.3rem" }}>Или укажите прямую ссылку вручную:</label>
+                          <input
+                            type="url"
+                            className="admin-form-input"
+                            value={formImage}
+                            onChange={(e) => setFormImage(e.target.value)}
+                            placeholder="https://example.com/image.jpg"
+                            required
+                          />
+                        </div>
+                        {formImage && (
+                          <div className="admin-image-preview-card">
+                            <img src={formImage} alt="Превью" className="admin-image-preview" />
+                            <button
+                              type="button"
+                              className="admin-preview-clear-btn"
+                              onClick={() => setFormImage("")}
+                            >
+                              Удалить ×
+                            </button>
+                          </div>
+                        )}
+                      </div>
+                    </div>
                   </div>
 
                   <div className="admin-form-group admin-form-span-2">
