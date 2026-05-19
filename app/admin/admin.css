@@ -531,3 +531,32 @@
     padding: 0.8rem 1rem;
   }
 }
+
+/* Восстановление стандартного курсора в админ-панели */
+.admin-body, .login-container {
+  cursor: default !important;
+}
+
+.admin-body *, .login-container * {
+  cursor: default !important;
+}
+
+.admin-body a, .login-container a,
+.admin-body button, .login-container button,
+.admin-body select, .login-container select,
+.admin-body option, .login-container option,
+.admin-body [role="button"], .login-container [role="button"],
+.admin-logout-btn, .admin-btn, .admin-btn-secondary, .admin-btn-danger, .admin-tab, .admin-modal-close {
+  cursor: pointer !important;
+}
+
+.admin-body input, .login-container input,
+.admin-body textarea, .login-container textarea {
+  cursor: text !important;
+}
+
+.admin-body input[type="submit"], .login-container input[type="submit"],
+.admin-body input[type="button"], .login-container input[type="button"] {
+  cursor: pointer !important;
+}
+
