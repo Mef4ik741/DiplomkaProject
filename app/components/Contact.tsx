@@ -3,10 +3,35 @@
 import { showToast } from "../utils/ui";
 
 export default function Contact() {
-  const handleForm = (e: React.FormEvent) => {
+  const handleForm = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    showToast("Спасибо! Мы свяжемся с вами совсем скоро ✈️");
-    (e.target as HTMLFormElement).reset();
+    const formData = new FormData(e.currentTarget);
+    const name = formData.get("name") as string;
+    const phone = formData.get("phone") as string;
+    const email = formData.get("email") as string;
+    const tourCategory = formData.get("tourCategory") as string;
+    const wishes = formData.get("wishes") as string;
+
+    const tourName = tourCategory ? `Консультация по направлению: ${tourCategory}` : "Общая консультация";
+
+    try {
+      const res = await fetch("/api/bookings", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name, phone, email, tourName, wishes }),
+      });
+
+      if (res.ok) {
+        showToast("Спасибо! Мы свяжемся с вами совсем скоро ✈️");
+        e.currentTarget.reset();
+      } else {
+        const errData = await res.json();
+        showToast(errData.error || "Ошибка сохранения заявки 😢");
+      }
+    } catch (err) {
+      console.error("Contact submission error:", err);
+      showToast("Ошибка отправки! Проверьте интернет-соединение 😢");
+    }
   };
 
   return (
@@ -56,6 +81,7 @@ export default function Contact() {
               <label className="form-label">Имя</label>
               <input
                 type="text"
+                name="name"
                 className="form-input"
                 placeholder="Иван"
                 required
@@ -65,6 +91,7 @@ export default function Contact() {
               <label className="form-label">Телефон</label>
               <input
                 type="tel"
+                name="phone"
                 className="form-input"
                 placeholder="+7 (___) ___-__-__"
                 required
@@ -75,13 +102,14 @@ export default function Contact() {
             <label className="form-label">Email</label>
             <input
               type="email"
+              name="email"
               className="form-input"
               placeholder="ivan@email.ru"
             />
           </div>
           <div className="form-group">
             <label className="form-label">Направление</label>
-            <select className="form-select">
+            <select name="tourCategory" className="form-select">
               <option value="">Не выбрано</option>
               <option>Европа</option>
               <option>Азия</option>
@@ -95,6 +123,7 @@ export default function Contact() {
           <div className="form-group">
             <label className="form-label">Ваши пожелания</label>
             <textarea
+              name="wishes"
               className="form-textarea"
               placeholder="Расскажите о вашей мечте..."
             ></textarea>

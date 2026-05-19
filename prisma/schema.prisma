@@ -1,0 +1,33 @@
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model Tour {
+  id          String   @id @default(uuid())
+  name        String
+  location    String
+  price       Int      // Price in Rubles
+  duration    String   // e.g. "10 ночей"
+  type        String   // e.g. "Авиа + отель", "All inclusive"
+  badge       String?  // e.g. "Хит продаж", "Успей!"
+  description String
+  image       String   // Image URL
+  createdAt   DateTime @default(now())
+}
+
+model Booking {
+  id            String   @id @default(uuid())
+  name          String
+  phone         String
+  email         String?
+  tourName      String   // Specific tour name or general location direction
+  wishes        String?  // Booking/wishes text
+  preferredTime String?  // Preferred call back time (from modal)
+  status        String   @default("NEW") // "NEW", "PROCESSING", "COMPLETED", "CANCELLED"
+  createdAt     DateTime @default(now())
+}

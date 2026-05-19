@@ -12,10 +12,36 @@ export default function Modal() {
     return () => document.removeEventListener("keydown", handleKeydown);
   }, []);
 
-  const handleModal = (e: React.FormEvent) => {
+  const handleModal = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    closeModal();
-    showToast("Заявка принята! Перезвоним в течение 30 минут 🎉");
+    const formData = new FormData(e.currentTarget);
+    const name = formData.get("name") as string;
+    const phone = formData.get("phone") as string;
+    const preferredTime = formData.get("preferredTime") as string;
+    
+    // Parse the selected destination from the modal title
+    const tourTitleText = document.getElementById("modal-title")?.textContent || "Интересует тур";
+    const tourName = tourTitleText.replace("Тур в ", "");
+
+    try {
+      const res = await fetch("/api/bookings", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name, phone, preferredTime, tourName }),
+      });
+
+      if (res.ok) {
+        closeModal();
+        showToast("Заявка принята! Перезвоним в течение 30 минут 🎉");
+        e.currentTarget.reset();
+      } else {
+        const errData = await res.json();
+        showToast(errData.error || "Ошибка сохранения заявки 😢");
+      }
+    } catch (err) {
+      console.error("Booking submission error:", err);
+      showToast("Ошибка отправки! Проверьте интернет-соединение 😢");
+    }
   };
 
   return (
@@ -33,6 +59,7 @@ export default function Modal() {
             <label className="form-label">Ваше имя</label>
             <input
               type="text"
+              name="name"
               className="form-input"
               placeholder="Имя"
               required
@@ -42,6 +69,7 @@ export default function Modal() {
             <label className="form-label">Телефон</label>
             <input
               type="tel"
+              name="phone"
               className="form-input"
               placeholder="+7 (___) ___-__-__"
               required
@@ -49,7 +77,7 @@ export default function Modal() {
           </div>
           <div className="form-group">
             <label className="form-label">Удобное время звонка</label>
-            <select className="form-select">
+            <select name="preferredTime" className="form-select">
               <option>Утром (9:00–12:00)</option>
               <option>Днём (12:00–17:00)</option>
               <option>Вечером (17:00–20:00)</option>

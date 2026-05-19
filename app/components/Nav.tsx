@@ -8,6 +8,10 @@ export default function Nav() {
   const pathname = usePathname();
   const isHome = pathname === "/";
 
+  if (pathname?.startsWith("/admin")) {
+    return null;
+  }
+
   useEffect(() => {
     const nav = document.getElementById("nav");
     
