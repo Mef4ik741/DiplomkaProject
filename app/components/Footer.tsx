@@ -116,7 +116,7 @@ export default function Footer() {
       </footer>
       <div className="footer-bottom">
         <p>
-          © 2024 Voyager Travel. Все права защищены. Лицензия туроператора РТО
+          © 2026 Voyager Travel. Все права защищены. Лицензия туроператора РТО
           012345
         </p>
         <p>Сделано с ♥ для путешественников</p>
